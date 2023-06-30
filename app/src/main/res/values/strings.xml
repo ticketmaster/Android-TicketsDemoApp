@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TicketsSDK Demo</string>
+    <string name="action_login">Login</string>
+    <string name="action_logout">Logout</string>
+    <string name="configuration_error_message">Something went wrong setting up your configuration.</string>
+    <string name="retry">Retry</string>
+    <string name="loading_configuration">Please wait while the sdk loads&#8230;</string>
+    <string name="getting_started_title">Getting Started</string>
+    <string name="getting_started_message">To get started, go to the developer documentation at https://ignite.ticketmaster.com/docs/tickets-sdk-overview</string>
+    <string name="cancel">Cancel</string>
+    <string name="configuration_error_title">Configuration Error</string>
+</resources>

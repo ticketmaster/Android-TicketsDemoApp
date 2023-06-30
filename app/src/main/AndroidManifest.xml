@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ticketmaster.sampleintegration.demo">
+
+  <application
+      android:allowBackup="true"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:theme="@style/AppTheme"
+      tools:replace="android:theme">
+
+    <activity android:name=".TicketsSdkHostActivity"
+        android:screenOrientation="portrait"
+        android:exported="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="LockedOrientationActivity">
+      <intent-filter>
+        <category android:name="android.intent.category.LAUNCHER" />
+        <action android:name="android.intent.action.VIEW" />
+        <action android:name="android.intent.action.MAIN" />
+      </intent-filter>
+    </activity>
+
+    <!-- Activity that will be launched when requesting LoginIntent-->
+    <activity
+        android:name="com.ticketmaster.authenticationsdk.internal.modernaccounts.presentation.ModernAccountsLoginScreen"
+        android:screenOrientation="portrait"
+        android:exported="true"
+        android:launchMode="singleInstance">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="@string/app_tm_modern_accounts_scheme" />
+        <data android:scheme="psdkprodscheme" />
+        <data android:scheme="psdkqascheme" />
+        <data android:scheme="psdkpreprodscheme" />
+        <data android:scheme="psdktm" />
+        <data android:scheme="psdkschemecommon" />
+        <data android:scheme="psdkqaschemecommon" />
+        <data android:scheme="psdkpreprodschemecommon" />
+      </intent-filter>
+    </activity>
+  </application>
+
+</manifest>

@@ -8,20 +8,33 @@ This is an example integration of the Ticketmaster Ignite SDK, Tickets framework
 * iOS Source (Tickets SDK): https://github.com/ticketmaster/iOS-TicketsDemoApp
 
 ## Demo App Screenshots
-
+![](/Users/l.burgos/Desktop/Workspace/Android/Android-TicketsDemoApp/screenshots/sample_integration_app_1.jpg)
+![](/Users/l.burgos/Desktop/Workspace/Android/Android-TicketsDemoApp/screenshots/sample_integration_app_2.jpg)
+![](/Users/l.burgos/Desktop/Workspace/Android/Android-TicketsDemoApp/screenshots/sample_integration_app_4.jpg)
 
 
 ## Getting Started
-
-
+1. Open Android-TicketsDemoApp in Android Studio
+    1. This will also download all the required libraries
+2. Update local.properties with your own API key, Team Name and colors, available from https://developer.ticketmaster.com/explore/
+   `config.consumer_key="consumer_key"`
+   `config.team_name="team_name"`
+   `config.branding_color="#color"`
+3. Build and Run
 
 # Example Code
 
 ## Configuration
-
+Update your API key, team name and branding colors in local.properties
+Authentication SDK is configured using the settings in local.properties.
+Tickets SDK inherits it's configuration from Authentication SDK
 
 ## Presentation
+There is one way to present the Tickets SDK:
 
+Generate the EventsFragment from TicketsSDKClient and add it to your view.
+
+Basic example in TicketsSDKHostActivity.kt
 
 ## Authentication
 
