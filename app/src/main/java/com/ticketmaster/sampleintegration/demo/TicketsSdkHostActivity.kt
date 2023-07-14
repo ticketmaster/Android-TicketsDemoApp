@@ -1,6 +1,7 @@
 package com.ticketmaster.sampleintegration.demo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.ticketmaster.authenticationsdk.AuthSource
 import com.ticketmaster.authenticationsdk.TMAuthentication
@@ -26,9 +28,11 @@ import com.ticketmaster.tickets.event_tickets.ModuleBase
 import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
 import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
 import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
+import com.ticketmaster.tickets.eventanalytic.UserAnalyticsDelegate
 import com.ticketmaster.tickets.ticketssdk.TicketsColors
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKClient
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKSingleton
+import com.ticketmaster.tickets.util.TMTicketsBrandingColor
 import com.ticketmaster.tickets.venuenext.VenueNextModule
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -63,12 +67,19 @@ class TicketsSdkHostActivity : AppCompatActivity() {
       }
   }
 
+  private val ticketColor: Int by lazy { android.graphics.Color.parseColor("#ef3e42") }
+
+  private val brandingColor: Int by lazy { android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR) }
+
+  private val headerColor: Int by lazy { android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR) }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_tickets_sdk_host)
     mGettingStartedContainer.visibility = View.VISIBLE
     mProgressDialog.show()
     setupAuthenticationSDK()
+    setupAnalytics()
   }
 
   private fun setupAuthenticationSDK() {
@@ -86,7 +97,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
       .apiKey(BuildConfig.CONSUMER_KEY) // Your consumer key
       .clientName(BuildConfig.TEAM_NAME) // Team name to be displayed
       //Optional value to define the colors for the Authentication page
-      .colors(createTMAuthenticationColors(android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR)))
+      .colors(createTMAuthenticationColors(brandingColor))
       .region(TMXDeploymentRegion.US) // Region that the SDK will use. Default is US
       .environment(TMXDeploymentEnvironment.Production) // Environment that the SDK will use. Default is Production
 
@@ -114,6 +125,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
           //After creating the TicketsSDKClient object, add it into the TicketsSDKSingleton
           TicketsSDKSingleton.setTicketsSdkClient(this)
 
+          setupTicketsColors()
+
           //Validate if there is an active token.
           if (tokenMap.isNotEmpty()) {
             //If there is an active token, it launches the event fragment
@@ -124,6 +137,10 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             resultLauncher.launch(TicketsSDKSingleton.getLoginIntent(this@TicketsSdkHostActivity))
           }
         }
+    }
+    if (authentication.configuration == null) {
+      mProgressDialog.dismiss()
+      mCancelledDialog.show()
     }
   }
 
@@ -144,6 +161,17 @@ class TicketsSdkHostActivity : AppCompatActivity() {
       darkColors(primary = Color(color), primaryVariant = Color(color), secondary = Color(color))
     )
 
+  private fun setupTicketsColors() {
+    //Affects the color of the container of ticket.
+    TMTicketsBrandingColor.setTicketColor(this@TicketsSdkHostActivity, ticketColor)
+
+    //Affects the branding color, like the color of the buttons
+    TMTicketsBrandingColor.setBrandingColor(this@TicketsSdkHostActivity, brandingColor)
+
+    //Affects the header color
+    TMTicketsBrandingColor.setHeaderColor(this@TicketsSdkHostActivity, headerColor)
+  }
+
   private fun launchTicketsView() {
     mGettingStartedContainer.visibility = View.GONE
     mProgressDialog.dismiss()
@@ -158,11 +186,32 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     ActivityResultContracts.StartActivityForResult()
   ) { result ->
     when (result.resultCode) {
-      RESULT_OK -> launchTicketsView()
+      RESULT_OK -> {
+        launchTicketsView()
+      }
       RESULT_CANCELED -> {
         mProgressDialog.dismiss()
-        mCancelledDialog.show()
       }
+    }
+  }
+
+  private fun setupAnalytics() {
+    //Initialize observer that will handle the analytics events
+    //Must be called the observeForever as this will kept alive the observer until
+    //the Activity is destroyed
+    UserAnalyticsDelegate.handler.getLiveData().observeForever(userAnalyticsObserver)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    //Remove the observer in the onDestroy, as it won't be needed to keep traking
+    //the analytics events.
+    UserAnalyticsDelegate.handler.getLiveData().removeObserver(userAnalyticsObserver)
+  }
+
+  private val userAnalyticsObserver = Observer<UserAnalyticsDelegate.AnalyticsData?> {
+    it?.let {
+      Log.d("Analytics", "Action name: ${it.actionName}, data: ${it.data}")
     }
   }
 
@@ -188,7 +237,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     TicketsSDKSingleton.moduleDelegate = object : TicketsModuleDelegate {
 
       override fun getCustomModulesLiveData(order: TicketsModuleDelegate.Order): LiveData<List<TicketsSDKModule>> {
-        val liveData: MutableLiveData<List<TicketsSDKModule>> = MutableLiveData<List<TicketsSDKModule>>()
+        val liveData: MutableLiveData<List<TicketsSDKModule>> =
+          MutableLiveData<List<TicketsSDKModule>>()
         val modules: ArrayList<TicketsSDKModule> = ArrayList()
         modules.add(getModuleBaseVenueNextView())
         modules.add(getDirectionsModule(order.orderInfo.latLng))
@@ -276,7 +326,15 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
   private fun logout() {
     //Logout from TicketsSDKClient and TMAuthentication
-    TicketsSDKSingleton.logout(this@TicketsSdkHostActivity)
+    TicketsSDKSingleton.logout(this@TicketsSdkHostActivity) {
+      //listener call after the logout process is completed.
+      resultLauncher.launch(TicketsSDKSingleton.getLoginIntent(this))
+
+      //remove the fragment from the container
+      supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
+        supportFragmentManager.beginTransaction().remove(it).commit()
+      }
+    }
   }
 
   //By calling the runBlocking function, it runs the suspend function in the Main Thread.
