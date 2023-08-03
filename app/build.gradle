@@ -55,7 +55,7 @@ dependencies {
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
   //Tickets SDK
   implementation 'com.ticketmaster.tickets:secure-entry:1.2.7'
-  implementation 'com.ticketmaster.tickets:tickets:3.0.2'
+  implementation 'com.ticketmaster.tickets:tickets:3.1.0'
   //Accounts SDK
-  implementation 'com.ticketmaster.accounts:authentication:3.0.3'
+  implementation 'com.ticketmaster.accounts:authentication:3.1.0'
 }
