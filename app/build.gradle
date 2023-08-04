@@ -51,11 +51,12 @@ dependencies {
   implementation 'com.google.android.material:material:1.9.0'
   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
   //Dependencies libraries needed for tickets and authentication sdks.
+  implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
   implementation 'androidx.compose.material:material:1.4.3'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
   //Tickets SDK
   implementation 'com.ticketmaster.tickets:secure-entry:1.2.7'
-  implementation 'com.ticketmaster.tickets:tickets:3.1.0'
+  implementation 'com.ticketmaster.tickets:tickets:3.1.1'
   //Accounts SDK
   implementation 'com.ticketmaster.accounts:authentication:3.1.0'
 }
