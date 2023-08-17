@@ -1,5 +1,6 @@
 package com.ticketmaster.sampleintegration.demo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -110,18 +111,21 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             .region(TMXDeploymentRegion.US) // Region that the SDK will use. Default is US
             .environment(TMXDeploymentEnvironment.Production) // Environment that the SDK will use. Default is Production
 
+    @SuppressLint("ConflictingOnColor")
     private fun createTMAuthenticationColors(color: Int): TMAuthentication.ColorTheme =
         TMAuthentication.ColorTheme(
             //The Color class is part of the Compose library
             lightColors(
                 primary = Color(color),
                 primaryVariant = Color(color),
-                secondary = Color(color)
+                secondary = Color(color),
+                onPrimary = Color.White // Color used for text and icons displayed on top of the primary color.
             ),
             darkColors(
                 primary = Color(color),
                 primaryVariant = Color(color),
-                secondary = Color(color)
+                secondary = Color(color),
+                onPrimary = Color.White // Color used for text and icons displayed on top of the primary color.
             )
         )
 
@@ -241,35 +245,19 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * This is only an example of how to integrate Venue Next SDK with the Presence SDK.
-     * You don't need to do it, if it's not necessary for your project.
-     * You should have enabled custom modules based on your consumer key, if not ask for help in
-     * TM support.
-     */
-    var venueNextModule: VenueNextModule = VenueNextModule.Builder("venueMap.getInstance()").build()
-    private fun setVenueNext() {
-        // Example
-        /*List<String> ids = Collections.singletonList("pass_your_venue_id");
-            VenueNextWeb.INSTANCE.retrieveExternalVenueMapping(this, ids, (venueMapping) -> {
-                if (venueMapping.getVenues() != null && !venueMapping.getVenues().isEmpty()) {
-                    VenueMap venueMap = venueMapping.getVenues().get(0);
-                    if (venueMap.getInstance() != null) {
-                        venueNextModule = new VenueNextModule.Builder(venueMap.getInstance()).build();
-                    }
-                }
-                return Unit.INSTANCE;
-            });*/
-    }
-
-    private fun setCustomModules () {
+    private fun setCustomModules() {
         TicketsSDKSingleton.moduleDelegate = object : TicketsModuleDelegate {
 
             override fun getCustomModulesLiveData(order: TicketsModuleDelegate.Order): LiveData<List<TicketsSDKModule>> {
                 val liveData: MutableLiveData<List<TicketsSDKModule>> =
                     MutableLiveData<List<TicketsSDKModule>>()
                 val modules: ArrayList<TicketsSDKModule> = ArrayList()
-                modules.add(getModuleBaseVenueNextView())
+
+                val venueNextModule = VenueNextModule.Builder(order.venueId).build()
+                modules.add(venueNextModule.createVenueNextView(this@TicketsSdkHostActivity) {
+                    //Venue next click event
+                })
+
                 modules.add(getDirectionsModule(order.orderInfo.latLng))
                 modules.add(
                     SeatUpgradesModule(
@@ -289,10 +277,6 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             ) {
             }
         }
-    }
-
-    private fun getModuleBaseVenueNextView(): ModuleBase {
-        return venueNextModule.createVenueNextView(this) { }
     }
 
     private fun getDirectionsModule(

@@ -58,5 +58,5 @@ dependencies {
   implementation 'com.ticketmaster.tickets:secure-entry:1.2.8'
   implementation 'com.ticketmaster.tickets:tickets:3.1.2'
   //Accounts SDK
-  implementation 'com.ticketmaster.accounts:authentication:3.1.1'
+  implementation 'com.ticketmaster.accounts:authentication:3.1.2'
 }

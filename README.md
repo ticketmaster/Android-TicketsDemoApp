@@ -19,9 +19,9 @@ This is an example integration of the Ticketmaster Ignite SDK, Tickets framework
    1. available from [https://developer.ticketmaster.com/explore/](https://developer.ticketmaster.com/explore/){target="_blank"}
 3. Update your Team Name and colors:
 ```
-psdk.config.consumer_key="consumer_key"
-psdk.config.team_name="team_name"
-psdk.config.branding_color="#color"
+config.consumer_key="consumer_key"
+config.team_name="team_name"
+config.branding_color="#color"
 ```
 4. For Modern Accounts Login
    1. Open the `Android Manifest.xml` and add the following `ModernAccountsLoginScreen`:
