@@ -29,6 +29,9 @@ import com.ticketmaster.tickets.event_tickets.ModuleBase
 import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
 import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
 import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
+import com.ticketmaster.tickets.event_tickets.modules.next_home_game.NextHomeGameModule
+import com.ticketmaster.tickets.event_tickets.modules.upcoming_artist_team.UpcomingArtistTeamModule
+import com.ticketmaster.tickets.event_tickets.modules.upcoming_venue.UpcomingVenueModule
 import com.ticketmaster.tickets.eventanalytic.UserAnalyticsDelegate
 import com.ticketmaster.tickets.ticketssdk.TicketsColors
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKClient
@@ -42,28 +45,20 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
     private val mGettingStartedContainer: ConstraintLayout by lazy { findViewById(R.id.getting_started_container) }
     private val mProgressDialog: AlertDialog by lazy {
-        AlertDialog
-            .Builder(this)
+        AlertDialog.Builder(this)
             .setView(LayoutInflater.from(this).inflate(R.layout.layout_loading_view, null, false))
-            .setCancelable(false)
-            .create()
-            .apply {
+            .setCancelable(false).create().apply {
                 setCanceledOnTouchOutside(false)
             }
     }
     private val mCancelledDialog: AlertDialog by lazy {
-        AlertDialog
-            .Builder(this@TicketsSdkHostActivity)
+        AlertDialog.Builder(this@TicketsSdkHostActivity)
             .setTitle(R.string.configuration_error_title)
             .setMessage(R.string.configuration_error_message)
             .setPositiveButton(R.string.retry) { _, _ ->
                 mProgressDialog.show()
                 setupAuthenticationSDK()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .setCancelable(false)
-            .create()
-            .apply {
+            }.setNegativeButton(R.string.cancel, null).setCancelable(false).create().apply {
                 setCanceledOnTouchOutside(false)
             }
     }
@@ -81,6 +76,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         mProgressDialog.show()
         setupAuthenticationSDK()
         setupAnalytics()
+        setCustomModules()
     }
 
     private fun setupAuthenticationSDK() {
@@ -100,9 +96,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun createTMAuthenticationBuilder(): TMAuthentication.Builder =
-        TMAuthentication
-            .Builder()
-            .apiKey(BuildConfig.CONSUMER_KEY) // Your consumer key
+        TMAuthentication.Builder().apiKey(BuildConfig.CONSUMER_KEY) // Your consumer key
             .clientName(BuildConfig.TEAM_NAME) // Team name to be displayed
             //Optional value to show screen previous to login
             .modernAccountsAutoQuickLogin(false)
@@ -120,8 +114,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 primaryVariant = Color(color),
                 secondary = Color(color),
                 onPrimary = Color.White // Color used for text and icons displayed on top of the primary color.
-            ),
-            darkColors(
+            ), darkColors(
                 primary = Color(color),
                 primaryVariant = Color(color),
                 secondary = Color(color),
@@ -135,14 +128,12 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         authentication.configuration?.let {
             val tokenMap = validateAuthToken(authentication)
 
-            TicketsSDKClient
-                .Builder()
+            TicketsSDKClient.Builder()
                 .authenticationSDKClient(authentication) //Authentication object
                 //Optional value to define the colors for the Tickets page
                 .colors(createTicketsColors(android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR)))
                 //Function that generates a TicketsSDKClient object
-                .build(this@TicketsSdkHostActivity)
-                .apply {
+                .build(this@TicketsSdkHostActivity).apply {
                     //After creating the TicketsSDKClient object, add it into the TicketsSDKSingleton
                     TicketsSDKSingleton.setTicketsSdkClient(this)
 
@@ -176,19 +167,13 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         return tokenMap
     }
 
-    private fun createTicketsColors(color: Int): TicketsColors =
-        TicketsColors(
-            lightColors(
-                primary = Color(color),
-                primaryVariant = Color(color),
-                secondary = Color(color)
-            ),
-            darkColors(
-                primary = Color(color),
-                primaryVariant = Color(color),
-                secondary = Color(color)
-            )
+    private fun createTicketsColors(color: Int): TicketsColors = TicketsColors(
+        lightColors(
+            primary = Color(color), primaryVariant = Color(color), secondary = Color(color)
+        ), darkColors(
+            primary = Color(color), primaryVariant = Color(color), secondary = Color(color)
         )
+    )
 
     private fun setupTicketsColors() {
         //Affects the color of the container of ticket.
@@ -261,19 +246,58 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 modules.add(getDirectionsModule(order.orderInfo.latLng))
                 modules.add(
                     SeatUpgradesModule(
-                        this@TicketsSdkHostActivity,
-                        NAMWebPageSettings(this@TicketsSdkHostActivity),
-                        order.eventId
+                        context = this@TicketsSdkHostActivity,
+                        webPageSettings = NAMWebPageSettings(this@TicketsSdkHostActivity),
+                        eventId = order.eventId
                     ).build()
                 )
+                runBlocking {
+                    modules.add(
+                        NextHomeGameModule(
+                            this@TicketsSdkHostActivity,
+                            order.eventId,
+                            DiscoveryEventNetworkRepository()
+                        ) { attractionId ->
+                            PrePurchaseActivity.newInstance(
+                                this@TicketsSdkHostActivity,
+                                attractionId = attractionId,
+                                venueId = order.venueId,
+                                flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
+                            )
+                        }.build()
+                    )
+                }
+                modules.add(UpcomingVenueModule(this@TicketsSdkHostActivity).build())
+                runBlocking {
+                    modules.add(
+                        UpcomingArtistTeamModule(this@TicketsSdkHostActivity,
+                            DiscoveryEventNetworkRepository(),
+                            order.eventId,
+                            { attractionId ->
+                                PrePurchaseActivity.newInstance(
+                                    this@TicketsSdkHostActivity,
+                                    attractionId = attractionId,
+                                    venueId = order.venueId,
+                                    flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
+                                )
+                            },
+                            { attractionId ->
+                                PrePurchaseActivity.newInstance(
+                                    this@TicketsSdkHostActivity,
+                                    attractionId = attractionId,
+                                    venueId = order.venueId,
+                                    flow = PrePurchaseActivity.PrePurchaseFlow.VENUE
+                                )
+                            }).build()
+                    )
+
+                }
                 liveData.value = modules
                 return liveData
             }
 
             override fun userDidPressActionButton(
-                buttonTitle: String?,
-                callbackValue: String?,
-                eventOrders: EventOrders?
+                buttonTitle: String?, callbackValue: String?, eventOrders: EventOrders?
             ) {
             }
         }
@@ -283,9 +307,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         latLng: TicketsModuleDelegate.LatLng?
     ): ModuleBase {
         return DirectionsModule(
-            this,
-            latLng?.latitude,
-            latLng?.longitude
+            this, latLng?.latitude, latLng?.longitude
         ).build()
     }
 
@@ -357,8 +379,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
     //Validates if there is an access token for each AuthSource, if there is one active, returns true.
     private suspend fun isLoggedIn(): Boolean =
-        TicketsSDKSingleton
-            .getTMAuthentication()?.let { authentication ->
+        TicketsSDKSingleton.getTMAuthentication()?.let { authentication ->
                 AuthSource.values().forEach {
                     if (authentication.getToken(it)?.isNotBlank() == true) {
                         return true

@@ -11,26 +11,39 @@
       android:theme="@style/AppTheme"
       tools:replace="android:theme">
 
-    <activity android:name=".TicketsSdkHostActivity"
-        android:screenOrientation="portrait"
+    <activity
+        android:name=".TicketsSdkHostActivity"
         android:exported="true"
+        android:screenOrientation="portrait"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
       <intent-filter>
         <category android:name="android.intent.category.LAUNCHER" />
+
         <action android:name="android.intent.action.VIEW" />
         <action android:name="android.intent.action.MAIN" />
       </intent-filter>
     </activity>
 
+    <activity
+        android:name=".PurchaseActivity"
+        android:exported="false"
+        android:screenOrientation="portrait" />
+
+    <activity
+        android:name=".PrePurchaseActivity"
+        android:exported="false"
+        android:screenOrientation="portrait" />
+
     <!-- Activity that will be launched when requesting LoginIntent-->
     <activity
         android:name="com.ticketmaster.authenticationsdk.internal.modernaccounts.presentation.ModernAccountsLoginScreen"
-        android:screenOrientation="portrait"
         android:exported="true"
-        android:launchMode="singleInstance">
+        android:launchMode="singleInstance"
+        android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
+
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- YOUR SCHEME will be provided in your app settings, copy it to this location -->
