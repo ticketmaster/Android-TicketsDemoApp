@@ -7,6 +7,11 @@ This is an example integration of the Ticketmaster Ignite SDK, Tickets framework
 * Android Source (Tickets SDK): https://github.com/ticketmaster/Android-TicketsDemoApp
 * iOS Source (Tickets SDK): https://github.com/ticketmaster/iOS-TicketsDemoApp
 
+### Change Log
+
+* Authentication SDK: https://ignite.ticketmaster.com/v1/docs/android-authentication-change-log
+* Tickets SDK: https://ignite.ticketmaster.com/v1/docs/android-tickets-change-log
+
 ## Demo App Screenshots
 
 <img src="screenshots/sample_integration_app_1.jpg" alt="Getting Started" /> <img src="screenshots/sample_integration_app_2.jpg" alt="Login" /> <img src="screenshots/sample_integration_app_4.jpg" alt="Tickets Listing Page" /> 
@@ -74,6 +79,7 @@ While not required, your application may want to control login-related processes
 * **Member Info**
 * **Logout**
   
+
 Tickets SDK handles Login/Logout on it's own, so there is no need for you to manually call any of these methods.
 
 
