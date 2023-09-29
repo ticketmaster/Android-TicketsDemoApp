@@ -42,7 +42,13 @@ config.branding_color="#color"
 </activity>
 ```
 
-5. Build and Run
+5. Optional
+   If your app supports transfer tickets via SMS, you must add the following permission into your `Android Manifest.xml`
+```
+<uses-permission android:name="android.permission.SEND_SMS"/>
+```
+
+6. Build and Run
 
 # Example Code
 
