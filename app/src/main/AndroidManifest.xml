@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ticketmaster.sampleintegration.demo">
 
-  <uses-permission android:name="android.permission.SEND_SMS"/>
-
   <application
       android:allowBackup="true"
       android:icon="@mipmap/ic_launcher"
@@ -49,7 +47,7 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- YOUR SCHEME will be provided in your app settings, copy it to this location -->
-        <data android:scheme="psdkscheme[client scheme name]" />
+        <data android:scheme="psdkschemefalcons" />
       </intent-filter>
     </activity>
   </application>
