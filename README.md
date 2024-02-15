@@ -36,7 +36,7 @@ config.branding_color="#color"
     android:name="com.ticketmaster.authenticationsdk.internal.modernaccounts.presentation.ModernAccountsLoginScreen"
     android:screenOrientation="portrait"
     android:exported="true"
-    android:launchMode="singleInstance">
+    android:launchMode="singleTop">
     <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
