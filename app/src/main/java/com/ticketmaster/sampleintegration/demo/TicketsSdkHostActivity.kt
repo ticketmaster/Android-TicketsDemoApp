@@ -247,7 +247,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 modules.add(
                     SeatUpgradesModule(
                         context = this@TicketsSdkHostActivity,
-                        webPageSettings = NAMWebPageSettings(this@TicketsSdkHostActivity),
+                        webPageSettings = NAMWebPageSettings(this@TicketsSdkHostActivity, order.tickets[0].eventSource),
                         eventId = order.eventId
                     ).build()
                 )
