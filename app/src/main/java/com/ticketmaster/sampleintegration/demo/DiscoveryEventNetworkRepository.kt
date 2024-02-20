@@ -47,7 +47,7 @@ class DiscoveryEventNetworkRepository : DiscoveryEventRepository {
                 EventDetails.Attractions(it.id)
             } ?: emptyList(), embeddedContainer?.discoveryVenueItemList?.map {
                 EventDetails.Venues(it.id ?: "")
-            } ?: emptyList())
+            } ?: listOf(EventDetails.Venues("")))
         }
         return null
     }
@@ -56,14 +56,15 @@ class DiscoveryEventNetworkRepository : DiscoveryEventRepository {
         val response =
             retrofit.create(DiscoveryApi::class.java).getEventsList(params).execute().body()
         if (response != null) {
-            val eventsEmbedded = response.eventsEmbedded
-            return EventSearchResults(eventsEmbedded!!.events!!.map {
-                EventSearchResults.Event(
-                    it.id,
-                    it.name,
-                    it.eventDatesResponse.start.dateTime,
-                    it.images.map { EventSearchResults.Event.Image(it.ratio, it.width, it.url) })
-            })
+                response.eventsEmbedded?.events?.let{ events ->
+                return EventSearchResults(events.map {
+                    EventSearchResults.Event(
+                        it.id,
+                        it.name,
+                        it.eventDatesResponse.start.dateTime,
+                        it.images.map { EventSearchResults.Event.Image(it.ratio, it.width, it.url) })
+                })
+            }
         }
         return null
     }
