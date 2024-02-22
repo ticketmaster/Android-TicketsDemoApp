@@ -27,8 +27,8 @@ import com.ticketmaster.tickets.TicketsModuleDelegate
 import com.ticketmaster.tickets.event_tickets.DirectionsModule
 import com.ticketmaster.tickets.event_tickets.ModuleBase
 import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
-import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
 import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
+import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
 import com.ticketmaster.tickets.event_tickets.modules.next_home_game.NextHomeGameModule
 import com.ticketmaster.tickets.event_tickets.modules.upcoming_artist_team.UpcomingArtistTeamModule
 import com.ticketmaster.tickets.event_tickets.modules.upcoming_venue.UpcomingVenueModule
@@ -247,7 +247,10 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 modules.add(
                     SeatUpgradesModule(
                         context = this@TicketsSdkHostActivity,
-                        webPageSettings = NAMWebPageSettings(this@TicketsSdkHostActivity, order.tickets[0].eventSource),
+                        webPageSettings = NAMWebPageSettings(
+                            this@TicketsSdkHostActivity,
+                            order.tickets[0].eventSource
+                        ),
                         eventId = order.eventId
                     ).build()
                 )
@@ -380,13 +383,13 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     //Validates if there is an access token for each AuthSource, if there is one active, returns true.
     private suspend fun isLoggedIn(): Boolean =
         TicketsSDKSingleton.getTMAuthentication()?.let { authentication ->
-                AuthSource.values().forEach {
-                    if (authentication.getToken(it)?.isNotBlank() == true) {
-                        return true
-                    }
+            AuthSource.values().forEach {
+                if (authentication.getToken(it)?.isNotBlank() == true) {
+                    return true
                 }
-                return false
-            } ?: false
+            }
+            return false
+        } ?: false
 
 }
 

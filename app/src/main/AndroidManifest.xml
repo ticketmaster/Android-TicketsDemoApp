@@ -47,7 +47,7 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- YOUR SCHEME will be provided in your app settings, copy it to this location -->
-        <data android:scheme="psdkschemefalcons" />
+        <data android:scheme="psdkscheme[client scheme name]" />
       </intent-filter>
     </activity>
   </application>
