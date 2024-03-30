@@ -58,8 +58,8 @@ dependencies {
   implementation 'androidx.compose.material:material:1.4.3'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
   //Tickets SDK
-  implementation 'com.ticketmaster.tickets:secure-entry:1.2.9'
-  implementation 'com.ticketmaster.tickets:tickets:3.4.4'
+  implementation 'com.ticketmaster.tickets:secure-entry:1.2.10'
+  implementation 'com.ticketmaster.tickets:tickets:3.5.0'
   //Accounts SDK
   implementation 'com.ticketmaster.accounts:authentication:3.4.1'
   // Retail SDK

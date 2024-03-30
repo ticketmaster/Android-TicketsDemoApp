@@ -249,7 +249,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                         context = this@TicketsSdkHostActivity,
                         webPageSettings = NAMWebPageSettings(
                             this@TicketsSdkHostActivity,
-                            order.tickets[0].eventSource
+                            order.tickets[0].source
                         ),
                         eventId = order.eventId
                     ).build()
