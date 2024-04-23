@@ -244,16 +244,23 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 })
 
                 modules.add(getDirectionsModule(order.orderInfo.latLng))
-                modules.add(
-                    SeatUpgradesModule(
-                        context = this@TicketsSdkHostActivity,
-                        webPageSettings = NAMWebPageSettings(
-                            this@TicketsSdkHostActivity,
-                            order.tickets[0].source
-                        ),
-                        eventId = order.eventId
-                    ).build()
-                )
+
+                //Validation that retrieve the event source type. In case of null,
+                // we recommend to don't display the Seat Upgrade module.
+                val firstTicketSource = order.tickets.firstOrNull()?.source
+                if (firstTicketSource != null) {
+                    modules.add(
+                        SeatUpgradesModule(
+                            context = this@TicketsSdkHostActivity,
+                            webPageSettings = NAMWebPageSettings(
+                                this@TicketsSdkHostActivity,
+                                firstTicketSource
+                            ),
+                            eventId = order.eventId
+                        ).build()
+                    )
+                }
+
                 runBlocking {
                     modules.add(
                         NextHomeGameModule(
