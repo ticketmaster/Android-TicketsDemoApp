@@ -5,16 +5,13 @@ buildscript {
   repositories {
     mavenCentral()
     google()
-    jcenter()
+    maven { url 'https://jitpack.io' }
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:7.3.1'
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
+    classpath 'com.android.tools.build:gradle:8.4.2'
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0"
     classpath "com.facebook.testing.screenshot:plugin:0.13.0"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20-RC"
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
   }
@@ -24,7 +21,7 @@ allprojects {
   repositories {
     mavenCentral()
     google()
-    jcenter()
+    maven { url 'https://jitpack.io' }
   }
 }
 

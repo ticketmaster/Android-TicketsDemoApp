@@ -4,11 +4,12 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
-  compileSdkVersion 33
+  compileSdk 34
   defaultConfig {
     applicationId "com.ticketmaster.sampleintegration.demo"
+    namespace "com.ticketmaster.sampleintegration.demo"
     minSdk 26
-    targetSdk 33
+    targetSdk 34
     versionCode 1
     versionName "1.0"
 
@@ -40,6 +41,9 @@ android {
   dataBinding {
     enabled = true
   }
+  buildFeatures {
+    buildConfig = true
+  }
 }
 
 //Resolution strategy that force the use of the corresponding libraries that causes duplicity
@@ -49,19 +53,19 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'androidx.core:core-ktx:1.10.1'
-  implementation 'androidx.appcompat:appcompat:1.6.1'
-  implementation 'com.google.android.material:material:1.9.0'
+  implementation 'androidx.core:core-ktx:1.13.1'
+  implementation 'androidx.appcompat:appcompat:1.7.0'
+  implementation 'com.google.android.material:material:1.12.0'
   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
   //Dependencies libraries needed for tickets and authentication sdks.
   implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
-  implementation 'androidx.compose.material:material:1.4.3'
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+  implementation 'androidx.compose.material:material:1.6.8'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
   //Tickets SDK
   implementation 'com.ticketmaster.tickets:secure-entry:1.2.10'
-  implementation 'com.ticketmaster.tickets:tickets:3.5.2'
+  implementation 'com.ticketmaster.tickets:tickets:3.7.5'
   //Accounts SDK
-  implementation 'com.ticketmaster.accounts:authentication:3.5.2'
+  implementation 'com.ticketmaster.accounts:authentication:3.7.0'
   // Retail SDK
   implementation "com.ticketmaster.retail:purchase:1.1.3"
   implementation "com.ticketmaster.retail:prepurchase:1.0.8"
