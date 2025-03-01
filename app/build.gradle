@@ -20,9 +20,18 @@ android {
     def consumerKey = properties.getProperty('config.consumer_key')
     def teamName = properties.getProperty('config.team_name')
     def brandingColor = properties.getProperty('config.branding_color')
+    def clientId = properties.getProperty('lafc.clientid')
+    def secret = properties.getProperty('lafc.secret')
+    def bucket = properties.getProperty('lafc.bucket')
+    def filename = properties.getProperty('lafc.filename')
+
     buildConfigField("String", "CONSUMER_KEY", "$consumerKey")
     buildConfigField("String", "TEAM_NAME", "$teamName")
     buildConfigField("String", "BRANDING_COLOR", "$brandingColor")
+    buildConfigField("String", "LAFC_CLIENT_ID", "$clientId")
+    buildConfigField("String", "LAFC_SECRET", "$secret")
+    buildConfigField("String", "LAFC_BUCKET_NAME", "$bucket")
+    buildConfigField("String", "LAFC_FILE_NAME", "$filename")
   }
 
   buildTypes {
@@ -44,6 +53,17 @@ android {
   buildFeatures {
     buildConfig = true
   }
+
+  packagingOptions {
+    resources {
+      excludes += [
+          'META-INF/DEPENDENCIES',
+          'META-INF/FastDoubleParser-LICENSE',
+          'META-INF/io.netty.versions.properties',
+          'META-INF/INDEX.LIST'
+      ]
+    }
+  }
 }
 
 //Resolution strategy that force the use of the corresponding libraries that causes duplicity
@@ -56,16 +76,23 @@ dependencies {
   implementation 'androidx.core:core-ktx:1.13.1'
   implementation 'androidx.appcompat:appcompat:1.7.0'
   implementation 'com.google.android.material:material:1.12.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+  implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
   //Dependencies libraries needed for tickets and authentication sdks.
   implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
-  implementation 'androidx.compose.material:material:1.6.8'
+  implementation 'androidx.compose.material:material:1.7.8'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+  implementation  'io.insert-koin:koin-android:3.5.6'
+  implementation  'androidx.compose.material3:material3:1.3.1'
+  implementation  'androidx.compose.material:material:1.7.8'
+  implementation  'androidx.compose.ui:ui:1.7.8'
+  implementation  'androidx.compose.ui:ui-graphics:1.7.8'
   //Tickets SDK
-  implementation 'com.ticketmaster.tickets:secure-entry:1.2.10'
-  implementation 'com.ticketmaster.tickets:tickets:3.9.1'
+  implementation 'com.ticketmaster.tickets:secure-entry:1.3.1'
+  implementation 'com.ticketmaster.tickets:tickets:3.10.2'
   //Accounts SDK
-  implementation 'com.ticketmaster.accounts:authentication:3.7.0'
+  implementation 'com.ticketmaster.accounts:authentication:3.10.0'
+  //Amazon
+  implementation 'software.amazon.awssdk:s3:2.20.140'
   // Retail SDK
   implementation "com.ticketmaster.retail:purchase:1.1.3"
   implementation "com.ticketmaster.retail:prepurchase:1.0.8"
