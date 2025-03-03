@@ -22,22 +22,18 @@ import com.ticketmaster.authenticationsdk.AuthSource
 import com.ticketmaster.authenticationsdk.TMAuthentication
 import com.ticketmaster.authenticationsdk.TMXDeploymentEnvironment
 import com.ticketmaster.authenticationsdk.TMXDeploymentRegion
+import com.ticketmaster.sampleintegration.demo.lafc.AwsCSVModule
+import com.ticketmaster.sampleintegration.demo.lafc.data.stub.AWSS3TestDataSource
 import com.ticketmaster.tickets.EventOrders
 import com.ticketmaster.tickets.TicketsModuleDelegate
 import com.ticketmaster.tickets.event_tickets.DirectionsModule
 import com.ticketmaster.tickets.event_tickets.ModuleBase
-import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
-import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
 import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
-import com.ticketmaster.tickets.event_tickets.modules.next_home_game.NextHomeGameModule
-import com.ticketmaster.tickets.event_tickets.modules.upcoming_artist_team.UpcomingArtistTeamModule
-import com.ticketmaster.tickets.event_tickets.modules.upcoming_venue.UpcomingVenueModule
 import com.ticketmaster.tickets.eventanalytic.UserAnalyticsDelegate
 import com.ticketmaster.tickets.ticketssdk.TicketsColors
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKClient
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKSingleton
 import com.ticketmaster.tickets.util.TMTicketsBrandingColor
-import com.ticketmaster.tickets.venuenext.VenueNextModule
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -231,6 +227,14 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun setCustomModules() {
+        //LAFC Module
+        val module = AwsCSVModule(
+            this,
+            AWSS3TestDataSource,
+            BuildConfig.LAFC_BUCKET_NAME,
+            BuildConfig.LAFC_FILE_NAME
+        )
+
         TicketsSDKSingleton.moduleDelegate = object : TicketsModuleDelegate {
 
             override fun getCustomModulesLiveData(order: TicketsModuleDelegate.Order): LiveData<List<TicketsSDKModule>> {
@@ -238,70 +242,10 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                     MutableLiveData<List<TicketsSDKModule>>()
                 val modules: ArrayList<TicketsSDKModule> = ArrayList()
 
-                val venueNextModule = VenueNextModule.Builder(order.venueId).build()
-                modules.add(venueNextModule.createVenueNextView(this@TicketsSdkHostActivity) {
-                    //Venue next click event
-                })
-
-                modules.add(getDirectionsModule(order.orderInfo.latLng))
-
-                //Validation that retrieve the event source type. In case of null,
-                // we recommend to don't display the Seat Upgrade module.
-                val firstTicketSource = order.tickets.firstOrNull()?.source
-                if (firstTicketSource != null) {
-                    modules.add(
-                        SeatUpgradesModule(
-                            context = this@TicketsSdkHostActivity,
-                            webPageSettings = NAMWebPageSettings(
-                                this@TicketsSdkHostActivity,
-                                firstTicketSource
-                            ),
-                            eventId = order.eventId
-                        ).build()
-                    )
-                }
-
                 runBlocking {
-                    modules.add(
-                        NextHomeGameModule(
-                            this@TicketsSdkHostActivity,
-                            order.eventId,
-                            DiscoveryEventNetworkRepository()
-                        ) { attractionId ->
-                            PrePurchaseActivity.newInstance(
-                                this@TicketsSdkHostActivity,
-                                attractionId = attractionId,
-                                venueId = order.venueId,
-                                flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
-                            )
-                        }.build()
-                    )
+                    modules.add(module.build(order.eventId, order.tickets))
                 }
-                modules.add(UpcomingVenueModule(this@TicketsSdkHostActivity).build())
-                runBlocking {
-                    modules.add(
-                        UpcomingArtistTeamModule(this@TicketsSdkHostActivity,
-                            DiscoveryEventNetworkRepository(),
-                            order.eventId,
-                            { attractionId ->
-                                PrePurchaseActivity.newInstance(
-                                    this@TicketsSdkHostActivity,
-                                    attractionId = attractionId,
-                                    venueId = order.venueId,
-                                    flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
-                                )
-                            },
-                            { attractionId ->
-                                PrePurchaseActivity.newInstance(
-                                    this@TicketsSdkHostActivity,
-                                    attractionId = attractionId,
-                                    venueId = order.venueId,
-                                    flow = PrePurchaseActivity.PrePurchaseFlow.VENUE
-                                )
-                            }).build()
-                    )
 
-                }
                 liveData.value = modules
                 return liveData
             }
@@ -399,4 +343,3 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         } ?: false
 
 }
-

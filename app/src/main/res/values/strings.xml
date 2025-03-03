@@ -9,4 +9,6 @@
     <string name="getting_started_message">To get started, go to the developer documentation at https://ignite.ticketmaster.com/docs/tickets-sdk-overview</string>
     <string name="cancel">Cancel</string>
     <string name="configuration_error_title">Configuration Error</string>
+    <!-- LAFC Metro Ticket -->
+    <string name="lafc_metro_title">LA METRO PASS: %s, %s, %s</string>
 </resources>
