@@ -31,7 +31,7 @@ class AWSS3RemoteDataSource(
 
     override suspend fun getCSVFile(bucketName: String, fileName: String): List<TicketCSV> {
         val request =
-            GetObjectRequest.builder().bucket(bucketName).key("$bucketName/$fileName").build()
+            GetObjectRequest.builder().bucket(bucketName).key(fileName).build()
         val inputStream = client.getObject(request)
         val reader = BufferedReader(InputStreamReader(inputStream))
         val csvData = mutableListOf<TicketCSV>()
@@ -47,7 +47,6 @@ class AWSS3RemoteDataSource(
                         columns[3].trim(),
                         columns[4].trim()
                     )
-                    Log.i("LAFCMetro", "Tickets CSV: $ticketCSV")
                     csvData.add(ticketCSV)
                 }
             }

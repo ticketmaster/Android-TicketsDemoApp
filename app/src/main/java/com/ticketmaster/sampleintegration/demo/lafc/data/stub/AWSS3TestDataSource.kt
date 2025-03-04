@@ -5,8 +5,7 @@ import com.ticketmaster.sampleintegration.demo.lafc.data.AWSS3DataSource
 
 object AWSS3TestDataSource : AWSS3DataSource {
 
-    override suspend fun getCSVFile(bucketName: String, fileName: String): List<TicketCSV> = listOf(
-        TicketCSV("ELF50222", "CVLG1", "A", "1", "PLZEWUUVSEJZASCZETQ"),
-        TicketCSV("ELF50222", "CVLG1", "A", "2", "TTMMRWLYNHQJBPTQDD")
-    )
+    //To use this test data source, you will need to change the source of data in TicketsSdkHostActivity.kt to point here,
+    //and add some TicketCSV data to the list.
+    override suspend fun getCSVFile(bucketName: String, fileName: String): List<TicketCSV> = listOf()
 }

@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import com.ticketmaster.sampleintegration.demo.R
@@ -31,15 +33,15 @@ class AwsCSVModule(
             withContext(Dispatchers.IO) {
                 repository.getCSVFile(bucketName, fileName).takeIf { it.isNotEmpty() }
             }?.filter { csv ->
-                true
-//                csv.hostEventId == eventId &&
-//                    tickets.any { ticket ->
-//                        ticket.mSectionLabel == csv.sectionName &&
-//                            ticket.mRowLabel == csv.rowName
-//                    }
+                csv.eventId == eventId &&
+                    tickets.any { ticket ->
+                        ticket.mSectionLabel == csv.sectionName &&
+                            ticket.mRowLabel == csv.rowName &&
+                            ticket.mSeatLabel == csv.seatNumber
+                    }
             }?.let { data ->
                 val container = LinearLayout(context).apply {
-                    layoutParams = LinearLayout.LayoutParams(
+                    layoutParams = LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
@@ -67,6 +69,12 @@ class AwsCSVModule(
         )
         view.findViewById<ImageView>(R.id.qrCodeView)
             .setImageBitmap(generateQRCode(metropass.metroCode))
+        val backgroundView = view.findViewById<ImageView>(R.id.background)
+
+        Glide.with(context)
+            .load("https://images.pexels.com/photos/297836/pexels-photo-297836.jpeg") // Replace with your actual image URL
+            .fitCenter()
+            .into(backgroundView)
 
         return view
     }

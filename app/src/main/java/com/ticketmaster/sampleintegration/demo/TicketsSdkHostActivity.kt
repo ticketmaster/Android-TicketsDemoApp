@@ -23,7 +23,7 @@ import com.ticketmaster.authenticationsdk.TMAuthentication
 import com.ticketmaster.authenticationsdk.TMXDeploymentEnvironment
 import com.ticketmaster.authenticationsdk.TMXDeploymentRegion
 import com.ticketmaster.sampleintegration.demo.lafc.AwsCSVModule
-import com.ticketmaster.sampleintegration.demo.lafc.data.stub.AWSS3TestDataSource
+import com.ticketmaster.sampleintegration.demo.lafc.data.remote.AWSS3RemoteDataSource
 import com.ticketmaster.tickets.EventOrders
 import com.ticketmaster.tickets.TicketsModuleDelegate
 import com.ticketmaster.tickets.event_tickets.DirectionsModule
@@ -230,7 +230,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         //LAFC Module
         val module = AwsCSVModule(
             this,
-            AWSS3TestDataSource,
+            AWSS3RemoteDataSource(BuildConfig.LAFC_CLIENT_ID, BuildConfig.LAFC_SECRET),
             BuildConfig.LAFC_BUCKET_NAME,
             BuildConfig.LAFC_FILE_NAME
         )
