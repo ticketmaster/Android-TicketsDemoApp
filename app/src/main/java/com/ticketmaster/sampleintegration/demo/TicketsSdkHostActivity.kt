@@ -227,7 +227,14 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun setCustomModules() {
-        //LAFC Module
+        /** To create this module, it is needed to have in the local.properties file the following values:
+         *  @param lafc.clientid clientID value from Amazon S3
+         *  @param lafc.secret secret value from Amazon S3
+         *  @param lafc.bucket bucket name
+         *  @param lafc.filename file name
+         *
+         *  This parameters will be retrieved in the build.gradle of the app and will be added to the BuildConfig object.
+         */
         val module = AwsCSVModule(
             this,
             AWSS3RemoteDataSource(BuildConfig.LAFC_CLIENT_ID, BuildConfig.LAFC_SECRET),
