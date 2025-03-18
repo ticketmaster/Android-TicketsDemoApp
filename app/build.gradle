@@ -92,8 +92,7 @@ dependencies {
   //Accounts SDK
   implementation 'com.ticketmaster.accounts:authentication:3.10.2'
   //Amazon
-  implementation 'software.amazon.awssdk:s3:2.20.140'
-  implementation 'software.amazon.awssdk:url-connection-client:2.20.140'
+  implementation 'com.amazonaws:aws-android-sdk-s3:2.72.0'
   //Glide
   implementation 'com.github.bumptech.glide:glide:4.14.2' // Load images
   //QR Code
