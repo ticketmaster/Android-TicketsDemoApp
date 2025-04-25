@@ -15,11 +15,11 @@ import com.ticketmaster.discoveryapi.models.DiscoveryVenue
 import com.ticketmaster.prepurchase.TMPrePurchase
 import com.ticketmaster.prepurchase.TMPrePurchaseFragmentFactory
 import com.ticketmaster.prepurchase.TMPrePurchaseWebsiteConfiguration
-import com.ticketmaster.prepurchase.data.CoordinatesWithMarketDomain
 import com.ticketmaster.prepurchase.data.Location
+import com.ticketmaster.prepurchase.internal.UpdateLocationInfo
 import com.ticketmaster.prepurchase.listener.TMPrePurchaseNavigationListener
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKSingleton
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 class PrePurchaseActivity : AppCompatActivity() {
     private lateinit var fragment: Fragment
@@ -109,20 +109,33 @@ class PrePurchaseActivity : AppCompatActivity() {
             )
         }
 
+        override fun updateCurrentLocation(updateLocationInfo: (UpdateLocationInfo) -> Unit) {
+            TODO("Not yet implemented")
+        }
+
         override fun onPrePurchaseClosed() {
             closeScreen.invoke()
         }
 
         override fun onDidRequestCurrentLocation(
-            globalMarketDomain: TMMarketDomain?, completion: (CoordinatesWithMarketDomain?) -> Unit
+            globalMarketDomain: TMMarketDomain?,
+            completion: (Location?) -> Unit
         ) {
             // MUST implement if requesting location from users' as well as
             // requesting they grant your application permission to their location
         }
 
+        override fun onDidRequestNativeLocationSelector() {
+            TODO("Not yet implemented")
+        }
+
         override fun onDidUpdateCurrentLocation(
             globalMarketDomain: TMMarketDomain?, location: Location
         ) {
+        }
+
+        override fun onPrePurchaseBackPressed() {
+            TODO("Not yet implemented")
         }
     }
 

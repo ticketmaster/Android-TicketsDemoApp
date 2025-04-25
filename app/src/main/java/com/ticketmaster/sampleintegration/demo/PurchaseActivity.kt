@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import com.ticketmaster.authenticationsdk.TMXDeploymentEnvironment
 import com.ticketmaster.authenticationsdk.TMXDeploymentRegion
 import com.ticketmaster.discoveryapi.enums.TMMarketDomain
-import com.ticketmaster.discoveryapi.utils.parcelable
 import com.ticketmaster.foundation.entity.TMAuthenticationParams
 import com.ticketmaster.purchase.TMPurchase
 import com.ticketmaster.purchase.TMPurchaseFragmentFactory
@@ -19,7 +18,13 @@ import com.ticketmaster.purchase.listener.TMPurchaseNavigationListener
 class PurchaseActivity : AppCompatActivity() {
     companion object {
 
-        fun newInstance(from: Activity, apiKey: String, eventId: String, market: TMMarketDomain, region: String) {
+        fun newInstance(
+            from: Activity,
+            apiKey: String,
+            eventId: String,
+            market: TMMarketDomain,
+            region: String
+        ) {
 
             val tmPurchase = TMPurchase(
                 apiKey = apiKey,
@@ -51,6 +56,7 @@ class PurchaseActivity : AppCompatActivity() {
         }
 
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val factory = TMPurchaseFragmentFactory(
             tmPurchaseNavigationListener = PurchaseNavigationListener { finish() }
@@ -63,19 +69,18 @@ class PurchaseActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
 
             val tmPurchase: TMPurchase =
-                intent.extras?.parcelable(TMPurchase::class.java.name)
+                intent.extras?.getParcelable(TMPurchase::class.java.name)
                     ?: throw TmInvalidConfigurationException()
 
             val tmPurchaseWebsiteConfiguration: TMPurchaseWebsiteConfiguration =
-                intent.extras?.parcelable(TMPurchaseWebsiteConfiguration::class.java.name)
+                intent.extras?.getParcelable(TMPurchaseWebsiteConfiguration::class.java.name)
                     ?: throw TmInvalidConfigurationException()
 
             // ExtraInfo exists to pass in data that TicketsSDK might need from RetailSDK, such
             // as the deployment region
             val extraInfo: PrePurchaseActivity.ExtraInfo =
-                intent.extras?.parcelable(PrePurchaseActivity.ExtraInfo::class.java.name)
+                intent.extras?.getParcelable(PrePurchaseActivity.ExtraInfo::class.java.name)
                     ?: throw TmInvalidConfigurationException()
-
 
 
             val bundle = tmPurchase.getPurchaseBundle(

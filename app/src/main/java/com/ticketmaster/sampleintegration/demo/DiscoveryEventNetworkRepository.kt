@@ -38,31 +38,43 @@ class DiscoveryEventNetworkRepository : DiscoveryEventRepository {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    override suspend fun getEventDetails(eventId: String): EventDetails? {
-        val response = retrofit.create(DiscoveryEventService::class.java)
-            .getEventDetails("", eventId, "", "", "").body()
-        if (response != null) {
-            val embeddedContainer = response.embeddedContainer
-            return EventDetails(embeddedContainer?.discoveryAttractionItemList?.map {
-                EventDetails.Attractions(it.id)
-            } ?: emptyList(), embeddedContainer?.discoveryVenueItemList?.map {
-                EventDetails.Venues(it.id ?: "")
+    override suspend fun getEventDetails(eventId: String): EventDetails {
+        val response =
+            retrofit.create(DiscoveryEventService::class.java)
+                .getEventDetails(
+                    domain = "",
+                    id = eventId,
+                    extensions = "",
+                    clientVisibility = "",
+                    view = ""
+                ).body()
+        val embeddedContainer = response?.embeddedContainer
+        return EventDetails(
+            attractions = embeddedContainer?.discoveryAttractionItemList?.mapNotNull { attraction ->
+                attraction.id?.let { id -> EventDetails.Attractions(id) }
+            }.orEmpty(),
+            venues = embeddedContainer?.discoveryVenueItemList?.map {
+                EventDetails.Venues(it.id.orEmpty())
             } ?: listOf(EventDetails.Venues("")))
-        }
-        return null
     }
 
     override suspend fun searchEvents(params: Map<String, String>): EventSearchResults? {
         val response =
             retrofit.create(DiscoveryApi::class.java).getEventsList(params).execute().body()
         if (response != null) {
-                response.eventsEmbedded?.events?.let{ events ->
+            response.eventsEmbedded?.events?.let { events ->
                 return EventSearchResults(events.map {
                     EventSearchResults.Event(
                         it.id,
                         it.name,
                         it.eventDatesResponse.start.dateTime,
-                        it.images.map { EventSearchResults.Event.Image(it.ratio, it.width, it.url) })
+                        it.images.map {
+                            EventSearchResults.Event.Image(
+                                it.ratio,
+                                it.width,
+                                it.url
+                            )
+                        })
                 })
             }
         }

@@ -77,6 +77,19 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         setupAuthenticationSDK()
         setupAnalytics()
         setCustomModules()
+        TicketsSDKSingleton.sessionExpiredDelegate.observe(this) {
+            TicketsSDKSingleton.logout(this) {
+                onLogout()
+            }
+        }
+    }
+
+    private fun onLogout() {
+        launchLogin()
+    }
+
+    private fun launchLogin() {
+        TicketsSDKSingleton.getLoginIntent(this)?.let { resultLauncher.launch(it) }
     }
 
     private fun setupAuthenticationSDK() {
@@ -146,7 +159,9 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                     } else {
                         //If there is no active token, it launches a login intent. Launch an ActivityForResult, if result
                         //is RESULT_OK, there is an active token to be retrieved.
-                        resultLauncher.launch(TicketsSDKSingleton.getLoginIntent(this@TicketsSdkHostActivity))
+                        TicketsSDKSingleton
+                            .getLoginIntent(this@TicketsSdkHostActivity)
+                            ?.let { resultLauncher.launch(it) }
                     }
                 }
         }
@@ -158,7 +173,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
     private suspend fun validateAuthToken(authentication: TMAuthentication): Map<AuthSource, String> {
         val tokenMap = mutableMapOf<AuthSource, String>()
-        AuthSource.values().forEach {
+        AuthSource.entries.forEach {
             //Validate if there is an active token for the AuthSource, if not it returns null.
             authentication.getToken(it)?.let { token ->
                 tokenMap[it] = token
@@ -251,13 +266,12 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 if (firstTicketSource != null) {
                     modules.add(
                         SeatUpgradesModule(
-                            context = this@TicketsSdkHostActivity,
                             webPageSettings = NAMWebPageSettings(
                                 this@TicketsSdkHostActivity,
                                 firstTicketSource
                             ),
                             eventId = order.eventId
-                        ).build()
+                        )
                     )
                 }
 
@@ -373,7 +387,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         //Logout from TicketsSDKClient and TMAuthentication
         TicketsSDKSingleton.logout(this@TicketsSdkHostActivity) {
             //listener call after the logout process is completed.
-            resultLauncher.launch(TicketsSDKSingleton.getLoginIntent(this))
+            TicketsSDKSingleton.getLoginIntent(this)?.let { resultLauncher.launch(it) }
 
             //remove the fragment from the container
             supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
@@ -390,7 +404,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     //Validates if there is an access token for each AuthSource, if there is one active, returns true.
     private suspend fun isLoggedIn(): Boolean =
         TicketsSDKSingleton.getTMAuthentication()?.let { authentication ->
-            AuthSource.values().forEach {
+            AuthSource.entries.forEach {
                 if (authentication.getToken(it)?.isNotBlank() == true) {
                     return true
                 }
@@ -399,4 +413,3 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         } ?: false
 
 }
-
