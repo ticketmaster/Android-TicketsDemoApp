@@ -1,0 +1,22 @@
+[versions]
+desugarJdkLibs = "2.1.5"
+gradle = "8.8.2"
+kotlinGradlePlugin = "2.0.0"
+material = "1.12.0"
+composeMaterial = "1.8.0"
+purchase = "3.3.1"
+ticketmasterPurchase = "0.0.7"
+ticketmasterTickets = "3.12.1"
+[libraries]
+compose-material = { module = "androidx.compose.material:material", version.ref = "composeMaterial" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
+ticketmaster-retail-foundation = { module = "com.ticketmaster.retail:foundation", version.ref = "purchase" }
+ticketmaster-retail-discoveryapi = { module = "com.ticketmaster.retail:discoveryapi", version.ref = "purchase" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+ticketmaster-retail-prepurchase = { module = "com.ticketmaster.retail:prepurchase", version.ref = "purchase" }
+ticketmaster-retail-purchase = { module = "com.ticketmaster.retail:purchase", version.ref = "purchase" }
+ticketmaster-purchase = { module = "com.ticketmaster.purchase:ticketmaster-purchase", version.ref = "ticketmasterPurchase" }
+ticketmaster-tickets = { module = "com.ticketmaster.tickets:tickets", version.ref = "ticketmasterTickets" }
+[plugins]

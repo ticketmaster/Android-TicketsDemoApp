@@ -1,2 +1,2 @@
 rootProject.name = "Android-TicketsDemoApp"
-include ':app'
+include(":app")
