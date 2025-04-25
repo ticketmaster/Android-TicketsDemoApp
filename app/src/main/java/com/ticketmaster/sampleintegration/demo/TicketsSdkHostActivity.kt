@@ -3,7 +3,6 @@ package com.ticketmaster.sampleintegration.demo
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -22,6 +21,8 @@ import com.ticketmaster.authenticationsdk.AuthSource
 import com.ticketmaster.authenticationsdk.TMAuthentication
 import com.ticketmaster.authenticationsdk.TMXDeploymentEnvironment
 import com.ticketmaster.authenticationsdk.TMXDeploymentRegion
+import com.ticketmaster.sampleintegration.demo.databinding.ActivityTicketsSdkHostBinding
+import com.ticketmaster.sampleintegration.demo.databinding.LayoutLoadingViewBinding
 import com.ticketmaster.tickets.EventOrders
 import com.ticketmaster.tickets.TicketsModuleDelegate
 import com.ticketmaster.tickets.event_tickets.DirectionsModule
@@ -43,11 +44,13 @@ import kotlinx.coroutines.runBlocking
 
 class TicketsSdkHostActivity : AppCompatActivity() {
 
-    private val mGettingStartedContainer: ConstraintLayout by lazy { findViewById(R.id.getting_started_container) }
-    private val mProgressDialog: AlertDialog by lazy {
+    private val binding by lazy { ActivityTicketsSdkHostBinding.inflate(layoutInflater) }
+
+    private val progressDialog: AlertDialog by lazy {
         AlertDialog.Builder(this)
-            .setView(LayoutInflater.from(this).inflate(R.layout.layout_loading_view, null, false))
-            .setCancelable(false).create().apply {
+            .setView(LayoutLoadingViewBinding.inflate(layoutInflater).root)
+            .setCancelable(false)
+            .create().apply {
                 setCanceledOnTouchOutside(false)
             }
     }
@@ -56,7 +59,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             .setTitle(R.string.configuration_error_title)
             .setMessage(R.string.configuration_error_message)
             .setPositiveButton(R.string.retry) { _, _ ->
-                mProgressDialog.show()
+                progressDialog.show()
                 setupAuthenticationSDK()
             }.setNegativeButton(R.string.cancel, null).setCancelable(false).create().apply {
                 setCanceledOnTouchOutside(false)
@@ -72,8 +75,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tickets_sdk_host)
-        mGettingStartedContainer.visibility = View.VISIBLE
-        mProgressDialog.show()
+        binding.layoutInstructionView.gettingStartedContainer.isVisible = false
+        progressDialog.show()
         setupAuthenticationSDK()
         setupAnalytics()
         setCustomModules()
@@ -166,7 +169,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 }
         }
         if (authentication.configuration == null) {
-            mProgressDialog.dismiss()
+            progressDialog.dismiss()
             mCancelledDialog.show()
         }
     }
@@ -202,8 +205,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun launchTicketsView() {
-        mGettingStartedContainer.visibility = View.GONE
-        mProgressDialog.dismiss()
+        binding.layoutInstructionView.gettingStartedContainer.isVisible = false
+        progressDialog.dismiss()
         //Retrieve an EventFragment
         TicketsSDKSingleton.getEventsFragment(this@TicketsSdkHostActivity)?.let {
             supportFragmentManager.beginTransaction().replace(R.id.tickets_sdk_view, it).commit()
@@ -220,7 +223,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             }
 
             RESULT_CANCELED -> {
-                mProgressDialog.dismiss()
+                progressDialog.dismiss()
             }
         }
     }
@@ -340,9 +343,9 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         lifecycleScope.launch {
             //Validates if there is an active user logged in.
             if (isLoggedIn()) {
-                mGettingStartedContainer.visibility = View.GONE
+                binding.layoutInstructionView.gettingStartedContainer.visibility = View.GONE
             } else {
-                mGettingStartedContainer.visibility = View.VISIBLE
+                binding.layoutInstructionView.gettingStartedContainer.visibility = View.VISIBLE
             }
         }
     }
