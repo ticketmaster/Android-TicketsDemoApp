@@ -145,7 +145,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             val tokenMap = validateAuthToken(authentication)
 
             TicketsSDKClient.Builder()
-                .authenticationSDKClient(authentication) //Authentication object
+                //Authentication object
+                .authenticationSDKClient(authentication)
                 //Optional value to define the colors for the Tickets page
                 .colors(createTicketsColors(android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR)))
                 //Function that generates a TicketsSDKClient object
@@ -167,6 +168,14 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                             ?.let { resultLauncher.launch(it) }
                     }
                 }
+            /**
+             * For testing purposes, you can use this to set to preprod etc.
+             */
+            TicketsSDKSingleton.setEnvironment(
+                this,
+                TicketsSDKSingleton.SDKEnvironment.Production,
+                TicketsSDKSingleton.HostEnvironment.US
+            )
         }
         if (authentication.configuration == null) {
             progressDialog.dismiss()
