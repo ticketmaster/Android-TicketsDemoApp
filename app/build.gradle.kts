@@ -20,19 +20,22 @@ android {
 
         // Load properties from local.properties
         if (rootProject.file("local.properties").exists()) {
-            Properties().apply {
+            val properties = Properties().apply {
                 rootProject.file("local.properties").inputStream().use { load(it) }
             }
+
+            // Tickets SDK Setup
+            val consumerKey = properties["config.consumer_key"] as String?
+            val teamName = properties["config.team_name"] as String?
+            val brandingColor = properties["config.branding_color"] as String?
+
+            println("branding color: $brandingColor")
+
+            buildConfigField("String", "CONSUMER_KEY", "\"$consumerKey\"")
+            buildConfigField("String", "TEAM_NAME", "\"$teamName\"")
+            buildConfigField("String", "BRANDING_COLOR", "\"$brandingColor\"")
+
         }
-
-        // Tickets SDK Setup
-        val consumerKey = properties["config.consumer_key"] as String?
-        val teamName = properties["config.team_name"] as String?
-        val brandingColor = properties["config.branding_color"] as String?
-
-        buildConfigField("String", "CONSUMER_KEY", "\"$consumerKey\"")
-        buildConfigField("String", "TEAM_NAME", "\"$teamName\"")
-        buildConfigField("String", "BRANDING_COLOR", "\"$brandingColor\"")
     }
 
     buildTypes {

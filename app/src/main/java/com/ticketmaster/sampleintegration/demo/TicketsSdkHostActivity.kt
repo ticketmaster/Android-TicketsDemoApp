@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -66,11 +67,11 @@ class TicketsSdkHostActivity : AppCompatActivity() {
             }
     }
 
-    private val ticketColor: Int by lazy { android.graphics.Color.parseColor("#ef3e42") }
+    private val ticketColor: Int by lazy { "#ef3e42".toColorInt() }
 
-    private val brandingColor: Int by lazy { android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR) }
+    private val brandingColor: Int by lazy { BuildConfig.BRANDING_COLOR.toColorInt() }
 
-    private val headerColor: Int by lazy { android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR) }
+    private val headerColor: Int by lazy { BuildConfig.BRANDING_COLOR.toColorInt() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -306,7 +307,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 modules.add(UpcomingVenueModule(this@TicketsSdkHostActivity).build())
                 runBlocking {
                     modules.add(
-                        UpcomingArtistTeamModule(this@TicketsSdkHostActivity,
+                        UpcomingArtistTeamModule(
+                            this@TicketsSdkHostActivity,
                             DiscoveryEventNetworkRepository(),
                             order.eventId,
                             { attractionId ->
