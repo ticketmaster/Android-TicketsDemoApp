@@ -44,9 +44,7 @@ class DiscoveryEventNetworkRepository : DiscoveryEventRepository {
                 .getEventDetails(
                     domain = "",
                     id = eventId,
-                    extensions = "",
-                    clientVisibility = "",
-                    view = ""
+                    queryParams = mapOf()
                 ).body()
         val embeddedContainer = response?.embeddedContainer
         return EventDetails(

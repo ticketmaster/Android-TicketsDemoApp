@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.ticketmaster.authenticationsdk.TMXDeploymentEnvironment
 import com.ticketmaster.authenticationsdk.TMXDeploymentRegion
+import com.ticketmaster.discoveryapi.enums.TMEnvironment
 import com.ticketmaster.discoveryapi.enums.TMMarketDomain
 import com.ticketmaster.foundation.entity.TMAuthenticationParams
 import com.ticketmaster.purchase.TMPurchase
@@ -31,7 +32,9 @@ class PurchaseActivity : AppCompatActivity() {
                 brandColor = ContextCompat.getColor(
                     from,
                     R.color.colorPrimary
-                )
+                ),
+                environment = TMEnvironment.Production,
+                purchaseUrlScheme = null,
             )
             val tmPurchaseWeb = TMPurchaseWebsiteConfiguration(
                 eventId,
