@@ -35,7 +35,7 @@
         android:exported="false"
         android:screenOrientation="portrait" />
 
-    <!-- Activity that will be launched when requesting LoginIntent-->
+    <!-- Activity that will be launched when requesting LoginIntent. If using SportXR, you don't need this -->
     <activity
         android:name="com.ticketmaster.authenticationsdk.internal.modernaccounts.presentation.ModernAccountsLoginScreen"
         android:exported="true"
@@ -47,7 +47,24 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <!-- YOUR SCHEME will be provided in your app settings, copy it to this location -->
-        <data android:scheme="psdkscheme[client scheme name]" />
+        <data android:scheme="[your scheme here]" />
+      </intent-filter>
+    </activity>
+
+    <!-- ONLY NEEDED IF USING SPORTXR-->
+    <activity
+        android:name="com.ticketmaster.authenticationsdk.internal.sportxr.presentation.SportXRLoginScreen"
+        android:exported="true"
+        android:screenOrientation="portrait">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <!-- YOUR SCHEME will be provided in your app settings, copy it to this location -->
+        <data android:scheme="[your scheme here]" />
+        <data android:host="login" />
       </intent-filter>
     </activity>
   </application>
