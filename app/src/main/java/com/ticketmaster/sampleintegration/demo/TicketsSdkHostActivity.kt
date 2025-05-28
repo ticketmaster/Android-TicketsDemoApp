@@ -81,9 +81,11 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         setupAuthenticationSDK()
         setupAnalytics()
         setCustomModules()
-        TicketsSDKSingleton.sessionExpiredDelegate.observe(this) {
-            TicketsSDKSingleton.logout(this) {
-                onLogout()
+        lifecycleScope.launch {
+            TicketsSDKSingleton.sessionExpiredDelegate.collect {
+                TicketsSDKSingleton.logout {
+                    onLogout()
+                }
             }
         }
     }
@@ -113,8 +115,10 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun createTMAuthenticationBuilder(): TMAuthentication.Builder =
-        TMAuthentication.Builder().apiKey(BuildConfig.CONSUMER_KEY) // Your consumer key
-            .clientName(BuildConfig.TEAM_NAME) // Team name to be displayed
+        TMAuthentication.Builder(
+            BuildConfig.CONSUMER_KEY, // Your consumer key
+            BuildConfig.TEAM_NAME  // Team name to be displayed
+        )
             //Optional value to show screen previous to login
             .modernAccountsAutoQuickLogin(false)
             //Optional value to define the colors for the Authentication page
@@ -399,13 +403,16 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
     private fun logout() {
         //Logout from TicketsSDKClient and TMAuthentication
-        TicketsSDKSingleton.logout(this@TicketsSdkHostActivity) {
-            //listener call after the logout process is completed.
-            TicketsSDKSingleton.getLoginIntent(this)?.let { resultLauncher.launch(it) }
+        lifecycleScope.launch {
+            TicketsSDKSingleton.logout {
+                //listener call after the logout process is completed.
+                TicketsSDKSingleton.getLoginIntent(this@TicketsSdkHostActivity)
+                    ?.let { resultLauncher.launch(it) }
 
-            //remove the fragment from the container
-            supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
+                //remove the fragment from the container
+                supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
+                    supportFragmentManager.beginTransaction().remove(it).commit()
+                }
             }
         }
     }
