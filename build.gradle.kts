@@ -4,10 +4,10 @@ buildscript {
 
     repositories {
         mavenCentral()
-        //mavenLocal()
+        mavenLocal()
         google()
         maven(url = "https://jitpack.io")
-        //maven (url = "https://oss.sonatype.org/content/repositories/snapshots/")
+        maven (url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 
     dependencies {
@@ -21,9 +21,9 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
-        //mavenLocal()
+        mavenLocal()
         google()
         maven(url = "https://jitpack.io")
-        //maven (url = "https://oss.sonatype.org/content/repositories/snapshots/")
+        maven (url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 }

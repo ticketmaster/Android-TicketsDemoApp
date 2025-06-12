@@ -27,7 +27,6 @@ import com.ticketmaster.sampleintegration.demo.databinding.LayoutLoadingViewBind
 import com.ticketmaster.tickets.EventOrders
 import com.ticketmaster.tickets.TicketsModuleDelegate
 import com.ticketmaster.tickets.event_tickets.DirectionsModule
-import com.ticketmaster.tickets.event_tickets.ModuleBase
 import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
 import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
 import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
@@ -81,9 +80,11 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         setupAuthenticationSDK()
         setupAnalytics()
         setCustomModules()
-        TicketsSDKSingleton.sessionExpiredDelegate.observe(this) {
-            TicketsSDKSingleton.logout(this) {
-                onLogout()
+        lifecycleScope.launch {
+            TicketsSDKSingleton.sessionExpiredDelegate.collect {
+                TicketsSDKSingleton.logout {
+                    onLogout()
+                }
             }
         }
     }
@@ -113,9 +114,12 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun createTMAuthenticationBuilder(): TMAuthentication.Builder =
-        TMAuthentication.Builder().apiKey(BuildConfig.CONSUMER_KEY) // Your consumer key
-            .clientName(BuildConfig.TEAM_NAME) // Team name to be displayed
-            //Optional value to show screen previous to login
+        TMAuthentication.Builder(
+            // Your consumer key
+            apiKey = BuildConfig.CONSUMER_KEY,
+            // Team name to be displayed
+            clientName = BuildConfig.TEAM_NAME
+        ) //Optional value to show screen previous to login
             .modernAccountsAutoQuickLogin(false)
             //Optional value to define the colors for the Authentication page
             .colors(createTMAuthenticationColors(brandingColor))
@@ -271,7 +275,17 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                     //Venue next click event
                 })
 
-                modules.add(getDirectionsModule(order.orderInfo.latLng))
+                val latitude = order.orderInfo.latLng?.latitude
+                val longitude = order.orderInfo.latLng?.longitude
+                if (latitude != null && longitude != null) {
+                    modules.add(
+                        DirectionsModule(
+                            context = this@TicketsSdkHostActivity,
+                            latitude = latitude,
+                            longitude = longitude
+                        ).build()
+                    )
+                }
 
                 //Validation that retrieve the event source type. In case of null,
                 // we recommend to don't display the Seat Upgrade module.
@@ -341,14 +355,6 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         }
     }
 
-    private fun getDirectionsModule(
-        latLng: TicketsModuleDelegate.LatLng?
-    ): ModuleBase {
-        return DirectionsModule(
-            this, latLng?.latitude, latLng?.longitude
-        ).build()
-    }
-
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
@@ -399,13 +405,16 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
     private fun logout() {
         //Logout from TicketsSDKClient and TMAuthentication
-        TicketsSDKSingleton.logout(this@TicketsSdkHostActivity) {
-            //listener call after the logout process is completed.
-            TicketsSDKSingleton.getLoginIntent(this)?.let { resultLauncher.launch(it) }
+        lifecycleScope.launch {
+            TicketsSDKSingleton.logout {
+                //listener call after the logout process is completed.
+                TicketsSDKSingleton.getLoginIntent(this@TicketsSdkHostActivity)
+                    ?.let { resultLauncher.launch(it) }
 
-            //remove the fragment from the container
-            supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
+                //remove the fragment from the container
+                supportFragmentManager.findFragmentById(R.id.tickets_sdk_view)?.let {
+                    supportFragmentManager.beginTransaction().remove(it).commit()
+                }
             }
         }
     }
