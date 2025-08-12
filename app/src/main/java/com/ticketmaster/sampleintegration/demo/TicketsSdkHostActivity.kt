@@ -108,8 +108,13 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         lifecycleScope.launch {
             // After creating the TMAuthentication.Builder object, the build() function is a suspend function,
             // that is way it is required to be called inside a coroutine.
-            val authentication = createTMAuthenticationBuilder().build(this@TicketsSdkHostActivity)
-            setupTicketsSDKClient(authentication)
+            createTMAuthenticationBuilder().build(this@TicketsSdkHostActivity)
+                .fold(
+                    onSuccess = { authentication ->
+                        setupTicketsSDKClient(authentication)
+                    },
+                    onFailure = {}
+                )
         }
     }
 
@@ -153,7 +158,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 //Authentication object
                 .authenticationSDKClient(authentication)
                 //Optional value to define the colors for the Tickets page
-                .colors(createTicketsColors(android.graphics.Color.parseColor(BuildConfig.BRANDING_COLOR)))
+                .colors(createTicketsColors(BuildConfig.BRANDING_COLOR.toColorInt()))
                 //Function that generates a TicketsSDKClient object
                 .build(this@TicketsSdkHostActivity).apply {
                     //After creating the TicketsSDKClient object, add it into the TicketsSDKSingleton
