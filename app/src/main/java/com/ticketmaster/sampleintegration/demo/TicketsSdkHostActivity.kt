@@ -38,6 +38,7 @@ import com.ticketmaster.tickets.ticketssdk.TicketsColors
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKClient
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKSingleton
 import com.ticketmaster.tickets.util.TMTicketsBrandingColor
+import com.ticketmaster.tickets.venuenext.VenueNextAction
 import com.ticketmaster.tickets.venuenext.VenueNextModule
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -277,8 +278,12 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 val modules: ArrayList<TicketsSDKModule> = ArrayList()
 
                 val venueNextModule = VenueNextModule.Builder(order.venueId).build()
-                modules.add(venueNextModule.createVenueNextView(this@TicketsSdkHostActivity) {
+                modules.add(venueNextModule.createVenueNextView(this@TicketsSdkHostActivity) { action ->
                     //Venue next click event
+                    when(action.venueNextAction) {
+                        VenueNextAction.ORDER -> {}// open order
+                        VenueNextAction.WALLET -> {}// call google wallet
+                    }
                 })
 
                 val latitude = order.orderInfo.latLng?.latitude
