@@ -280,9 +280,15 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                 val venueNextModule = VenueNextModule.Builder(order.venueId).build()
                 modules.add(venueNextModule.createVenueNextView(this@TicketsSdkHostActivity) { action ->
                     //Venue next click event
-                    when(action.venueNextAction) {
-                        VenueNextAction.ORDER -> {}// open order
-                        VenueNextAction.WALLET -> {}// call google wallet
+                    when (action.venueNextAction) {
+                        // open order
+                        VenueNextAction.ORDER -> {
+                            Log.d("VenueNext", "Click Order Btn")
+                        }
+                        // call google wallet
+                        VenueNextAction.WALLET -> {
+                            Log.d("VenueNext", "Click Wallet Btn")
+                        }
                     }
                 })
 
