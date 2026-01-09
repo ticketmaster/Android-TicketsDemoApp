@@ -34,10 +34,10 @@ import com.ticketmaster.tickets.event_tickets.modules.next_home_game.NextHomeGam
 import com.ticketmaster.tickets.event_tickets.modules.upcoming_artist_team.UpcomingArtistTeamModule
 import com.ticketmaster.tickets.event_tickets.modules.upcoming_venue.UpcomingVenueModule
 import com.ticketmaster.tickets.eventanalytic.UserAnalyticsDelegate
-import com.ticketmaster.tickets.ticketssdk.TicketsColors
+import com.ticketmaster.tickets.ticketssdk.TicketsColor
+import com.ticketmaster.tickets.ticketssdk.TicketsColorScheme
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKClient
 import com.ticketmaster.tickets.ticketssdk.TicketsSDKSingleton
-import com.ticketmaster.tickets.util.TMTicketsBrandingColor
 import com.ticketmaster.tickets.venuenext.VenueNextAction
 import com.ticketmaster.tickets.venuenext.VenueNextModule
 import kotlinx.coroutines.launch
@@ -150,20 +150,18 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     private suspend fun setupTicketsSDKClient(authentication: TMAuthentication) {
         //After called the build function of TMAuthentication.Builder object, we validate if configuration is different
         //from null, to verify if it was retrieved satisfactory a configuration file from the given params.
-        authentication.configuration?.let {
+        authentication.configuration.let {
             val tokenMap = validateAuthToken(authentication)
 
-            TicketsSDKClient.Builder()
+            TicketsSDKClient.Builder(
+                colors = createTicketsColors(brandingColor)
+            )
                 //Authentication object
                 .authenticationSDKClient(authentication)
-                //Optional value to define the colors for the Tickets page
-                .colors(createTicketsColors(BuildConfig.BRANDING_COLOR.toColorInt()))
                 //Function that generates a TicketsSDKClient object
                 .build(this@TicketsSdkHostActivity).apply {
                     //After creating the TicketsSDKClient object, add it into the TicketsSDKSingleton
                     TicketsSDKSingleton.setTicketsSdkClient(this)
-
-                    setupTicketsColors()
 
                     //Validate if there is an active token.
                     if (tokenMap.isNotEmpty()) {
@@ -203,27 +201,9 @@ class TicketsSdkHostActivity : AppCompatActivity() {
         return tokenMap
     }
 
-    private fun createTicketsColors(color: Int): TicketsColors = TicketsColors(
-        lightColorScheme = lightColorScheme(
-            primary = Color(color),
-            secondary = Color(color)
-        ),
-        darkColorScheme = darkColorScheme(
-            primary = Color(color),
-            secondary = Color(color)
-        )
+    private fun createTicketsColors(color: Int): TicketsColorScheme = TicketsColorScheme(
+        primary = TicketsColor(color.toLong())
     )
-
-    private fun setupTicketsColors() {
-        //Affects the color of the container of ticket.
-        TMTicketsBrandingColor.setTicketColor(this@TicketsSdkHostActivity, ticketColor)
-
-        //Affects the branding color, like the color of the buttons
-        TMTicketsBrandingColor.setBrandingColor(this@TicketsSdkHostActivity, brandingColor)
-
-        //Affects the header color
-        TMTicketsBrandingColor.setHeaderColor(this@TicketsSdkHostActivity, headerColor)
-    }
 
     private fun launchTicketsView() {
         binding.layoutInstructionView.gettingStartedContainer.isVisible = false
@@ -306,7 +286,7 @@ class TicketsSdkHostActivity : AppCompatActivity() {
 
                 //Validation that retrieve the event source type. In case of null,
                 // we recommend to don't display the Seat Upgrade module.
-                val firstTicketSource = order.tickets.firstOrNull()?.source
+                val firstTicketSource = order.source
                 if (firstTicketSource != null) {
                     modules.add(
                         SeatUpgradesModule(
