@@ -6,7 +6,7 @@ material = "1.13.0"
 composeMaterial = "1.9.3"
 purchase = "3.8.2"
 ticketmasterPurchase = "0.4.3"
-ticketmasterTickets = "3.15.0-RC3"
+ticketmasterTickets = "3.15.0"
 [libraries]
 compose-material = { module = "androidx.compose.material:material", version.ref = "composeMaterial" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }

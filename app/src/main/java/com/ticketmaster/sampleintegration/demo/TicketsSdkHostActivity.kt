@@ -202,7 +202,8 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun createTicketsColors(color: Int): TicketsColorScheme = TicketsColorScheme(
-        primary = TicketsColor(color.toLong())
+        primary = TicketsColor(color.toLong()),
+        eventsTopBar = TicketsColor(color.toLong())
     )
 
     private fun launchTicketsView() {
