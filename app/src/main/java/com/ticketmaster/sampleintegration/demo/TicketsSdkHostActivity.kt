@@ -114,24 +114,26 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                     onSuccess = { authentication ->
                         setupTicketsSDKClient(authentication)
                     },
-                    onFailure = {}
+                    onFailure = {
+                        android.util.Log.e("mama", "mia")
+                    }
                 )
         }
     }
 
     private fun createTMAuthenticationBuilder(): TMAuthentication.Builder =
-        TMAuthentication.Builder(
-            // Your consumer key
-            apiKey = BuildConfig.CONSUMER_KEY,
-            // Team name to be displayed
-            clientName = BuildConfig.TEAM_NAME
-        ) //Optional value to show screen previous to login
-            .modernAccountsAutoQuickLogin(false)
-            //Optional value to define the colors for the Authentication page
-            .colors(createTMAuthenticationColors(brandingColor))
-            .region(TMXDeploymentRegion.US) // Region that the SDK will use. Default is US
-            .environment(TMXDeploymentEnvironment.Production) // Environment that the SDK will use. Default is Production
-
+        TMAuthentication
+      .Builder( "CT6MEN5uC8TXwof43fteff38aHdLCwMx", "Birmingham City") // Team name to be displayed
+      //Optional value to define the colors for the Authentication page
+      .colors(TMAuthentication.ColorTheme(
+        //The Color class is part of the Compose library
+        lightColorScheme(primary = Color.Red, onPrimary = Color.Red, secondary = Color.Red, primaryContainer = Color.White),
+        darkColorScheme(primary = Color.Red, onPrimary = Color.Red, secondary = Color.Red, primaryContainer = Color.White)
+      ))
+      .modernAccountsQuickLogin(true)
+      .modernAccountsAutoQuickLogin(true)
+      .region(TMXDeploymentRegion.UK) // Region that the SDK will use. Default is US
+      .environment(TMXDeploymentEnvironment.Preproduction)
     @SuppressLint("ConflictingOnColor")
     private fun createTMAuthenticationColors(color: Int): TMAuthentication.ColorTheme =
         TMAuthentication.ColorTheme(
