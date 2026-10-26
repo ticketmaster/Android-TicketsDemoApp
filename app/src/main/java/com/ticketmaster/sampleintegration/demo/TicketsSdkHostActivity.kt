@@ -16,7 +16,6 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.ticketmaster.authenticationsdk.AuthSource
 import com.ticketmaster.authenticationsdk.TMAuthentication
@@ -30,9 +29,6 @@ import com.ticketmaster.tickets.event_tickets.DirectionsModule
 import com.ticketmaster.tickets.event_tickets.NAMWebPageSettings
 import com.ticketmaster.tickets.event_tickets.SeatUpgradesModule
 import com.ticketmaster.tickets.event_tickets.TicketsSDKModule
-import com.ticketmaster.tickets.event_tickets.modules.next_home_game.NextHomeGameModule
-import com.ticketmaster.tickets.event_tickets.modules.upcoming_artist_team.UpcomingArtistTeamModule
-import com.ticketmaster.tickets.event_tickets.modules.upcoming_venue.UpcomingVenueModule
 import com.ticketmaster.tickets.eventanalytic.UserAnalyticsDelegate
 import com.ticketmaster.tickets.ticketssdk.TicketsColor
 import com.ticketmaster.tickets.ticketssdk.TicketsColorScheme
@@ -231,22 +227,13 @@ class TicketsSdkHostActivity : AppCompatActivity() {
     }
 
     private fun setupAnalytics() {
-        //Initialize observer that will handle the analytics events
-        //Must be called the observeForever as this will kept alive the observer until
-        //the Activity is destroyed
-        UserAnalyticsDelegate.handler.getLiveData().observeForever(userAnalyticsObserver)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //Remove the observer in the onDestroy, as it won't be needed to keep traking
-        //the analytics events.
-        UserAnalyticsDelegate.handler.getLiveData().removeObserver(userAnalyticsObserver)
-    }
-
-    private val userAnalyticsObserver = Observer<UserAnalyticsDelegate.AnalyticsData?> {
-        it?.let {
-            Log.d("Analytics", "Action name: ${it.actionName}, data: ${it.data}")
+        //Initialize observer that will handle the analytics events.
+        //It stays active until the Activity is destroyed and is removed automatically,
+        //so no events are dropped while the Activity is in the background.
+        UserAnalyticsDelegate.handler.observe(this) {
+            it?.let {
+                Log.d("Analytics", "Action name: ${it.actionName}, data: ${it.data}")
+            }
         }
     }
 
@@ -300,54 +287,15 @@ class TicketsSdkHostActivity : AppCompatActivity() {
                     )
                 }
 
-                runBlocking {
-                    modules.add(
-                        NextHomeGameModule(
-                            this@TicketsSdkHostActivity,
-                            order.eventId,
-                            DiscoveryEventNetworkRepository()
-                        ) { attractionId ->
-                            PrePurchaseActivity.newInstance(
-                                this@TicketsSdkHostActivity,
-                                attractionId = attractionId,
-                                venueId = order.venueId,
-                                flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
-                            )
-                        }.build()
-                    )
-                }
-                modules.add(UpcomingVenueModule(this@TicketsSdkHostActivity).build())
-                runBlocking {
-                    modules.add(
-                        UpcomingArtistTeamModule(
-                            this@TicketsSdkHostActivity,
-                            DiscoveryEventNetworkRepository(),
-                            order.eventId,
-                            { attractionId ->
-                                PrePurchaseActivity.newInstance(
-                                    this@TicketsSdkHostActivity,
-                                    attractionId = attractionId,
-                                    venueId = order.venueId,
-                                    flow = PrePurchaseActivity.PrePurchaseFlow.ATTRACTION
-                                )
-                            },
-                            { attractionId ->
-                                PrePurchaseActivity.newInstance(
-                                    this@TicketsSdkHostActivity,
-                                    attractionId = attractionId,
-                                    venueId = order.venueId,
-                                    flow = PrePurchaseActivity.PrePurchaseFlow.VENUE
-                                )
-                            }).build()
-                    )
-
-                }
                 liveData.value = modules
                 return liveData
             }
 
             override fun userDidPressActionButton(
-                buttonTitle: String?, callbackValue: String?, eventOrders: EventOrders?
+                moduleId: String?,
+                buttonTitle: String?,
+                callbackValue: String?,
+                eventOrders: EventOrders?
             ) {
             }
         }
