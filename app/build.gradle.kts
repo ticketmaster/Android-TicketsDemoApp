@@ -52,14 +52,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 
     buildFeatures {
         buildConfig = true
         viewBinding = true
         dataBinding = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
     }
 }
 
@@ -73,6 +76,9 @@ dependencies {
     implementation(libs.ticketmaster.retail.prepurchase)
     implementation(libs.ticketmaster.retail.discoveryapi)
     implementation(libs.ticketmaster.retail.foundation)
-    implementation(libs.ticketmaster.purchase)
+    implementation(libs.ticketmaster.purchase) {
+        // Legacy artifact (2022); its kotlinx.android.parcel classes are already provided by kotlin-parcelize-runtime
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
+    }
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
